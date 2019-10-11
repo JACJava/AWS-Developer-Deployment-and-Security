@@ -1,0 +1,17 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+
+  "Description": "HBFL Application Kinesis Stream Creation",
+
+  "Resources": {
+   "KinesisStream": {
+        "Type": "AWS::Kinesis::Stream",
+        "Properties": {
+            "Name": "hamster-race-results2",
+            "RetentionPeriodHours" : 24,
+            "ShardCount": 1
+        }
+    }
+  }
+
+}
