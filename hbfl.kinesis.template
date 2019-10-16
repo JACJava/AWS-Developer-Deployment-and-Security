@@ -7,7 +7,7 @@
    "KinesisStream": {
         "Type": "AWS::Kinesis::Stream",
         "Properties": {
-            "Name": "hamster-race-results2",
+            "Name": "hamster-race-results",
             "RetentionPeriodHours" : 24,
             "ShardCount": 1
         }
