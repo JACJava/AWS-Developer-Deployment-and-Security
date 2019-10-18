@@ -29,19 +29,19 @@
     "KeyNameParameter": {
       "Description": "Key pair name for the EC2 instance",
       "Type": "AWS::EC2::KeyPair::KeyName",
-      "Default": "cf"
+      "Default": "hamster_key"
     },
 
     "VPCIdParameter": {
       "Description": "VPC id for the Target Group",
       "Type": "AWS::EC2::VPC::Id",
-      "Default": "vpc-69e7600e"
+      "Default": "vpc-0164826a"
     },
 
     "SubnetListParameter": {
       "Description": "List of Subnets for the Load Balancer. These should be for the a and b availability zones",
       "Type": "List<AWS::EC2::Subnet::Id>",
-      "Default": "subnet-e2f79887,subnet-b4be989e"
+      "Default": "subnet-bda2acd5,subnet-bda2acd5"
     }
   },
 
