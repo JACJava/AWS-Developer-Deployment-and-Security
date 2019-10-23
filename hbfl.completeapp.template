@@ -3,14 +3,6 @@
 
   "Description": "Hamster Ball Fantasy League Application From Cloud FormationCF",
 
-  "Mappings": {
-    "Static": {
-      "UserData": {
-        "Value": "IyEvYmluL2Jhc2gNCmN1cmwgLS1zaWxlbnQgLS1sb2NhdGlvbiBodHRwczovL3JwbS5ub2Rlc291cmNlLmNvbS9zZXR1cF84LnggfCBzdWRvIGJhc2ggLQ0Kc3VkbyB5dW0gaW5zdGFsbCAteSBub2RlanMNCnN1ZG8geXVtIGluc3RhbGwgLXkgZ2l0DQpnaXQgY2xvbmUgaHR0cHM6Ly9naXRodWIuY29tL0pBQ2phdmEvaGJmbC1tYXN0ZXIuZ2l0IC0tYnJhbmNoIENvbW11bmljYXRpbmctd2l0aC1BV1MgLS1zaW5nbGUtYnJhbmNoDQpjZCBoYmZsLW1hc3Rlcg0KbnBtIGkNCm5wbSBydW4gc3RhcnQ="
-      }
-    }
-  },
-
   "Parameters": {
     "InstanceTypeParameter": {
       "Description": "EC2 instance type",
@@ -112,7 +104,7 @@
         "InstanceType": { "Ref": "InstanceTypeParameter"},
         "KeyName": { "Ref": "KeyNameParameter" },
         "SecurityGroups": [ { "Ref": "HamsterSecurityGroupCF" } ],
-        "UserData": { "Fn::FindInMap": ["Static", "UserData", "Value"] }
+        "UserData": "IyEvYmluL2Jhc2gNCmN1cmwgLS1zaWxlbnQgLS1sb2NhdGlvbiBodHRwczovL3JwbS5ub2Rlc291cmNlLmNvbS9zZXR1cF84LnggfCBzdWRvIGJhc2ggLQ0Kc3VkbyB5dW0gaW5zdGFsbCAteSBub2RlanMNCnN1ZG8geXVtIGluc3RhbGwgLXkgZ2l0DQpnaXQgY2xvbmUgaHR0cHM6Ly9naXRodWIuY29tL0pBQ2phdmEvaGJmbC1tYXN0ZXIuZ2l0IC0tYnJhbmNoIENvbW11bmljYXRpbmctd2l0aC1BV1MgLS1zaW5nbGUtYnJhbmNoDQpjZCBoYmZsLW1hc3Rlcg0KbnBtIGkNCm5wbSBydW4gc3RhcnQ="
       }
     },
 
