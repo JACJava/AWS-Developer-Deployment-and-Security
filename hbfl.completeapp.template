@@ -52,8 +52,7 @@
         "InstanceType": { "Ref": "InstanceTypeParameter" },
         "SecurityGroupIds": [ { "Ref": "HamsterSecurityGroupCF" } ],
         "KeyName": { "Ref": "KeyNameParameter" },
-        "ImageId": { "Ref": "ImageIdParameter"},
-        "UserData": { "Fn::FindInMap": ["Static", "UserData", "Value"] }
+        "ImageId": { "Ref": "ImageIdParameter"}
       }
     },
 
