@@ -183,8 +183,16 @@
 
   "Outputs": {
     "LoadBalancerUrl": {
-      "Description": "InstanceId of the newly created EC2 instance",
+      "Description": "URL link to the HamsterLoadBalancerCF",
       "Value": { "Fn::Sub": ["http://${url}", { "url": { "Fn::GetAtt": [ "HamsterLoadBalancerCF", "DNSName" ] } }] }
+    },
+    "HamsterEC2InstanceCF": {
+      "Description": "InstanceId of the newly created EC2 instance",
+      "Value" : { "Ref" : "HamsterEC2InstanceCF" }
+    },
+    "HamsterEC2InstancePublicDNSNameCF": {
+      "Description": "Public DNS Name of the newly created EC2 instance",
+      "Value": {"Fn::GetAtt" : ["HamsterEC2InstanceCF","PublicDnsName" ]}
     }
   }
 
