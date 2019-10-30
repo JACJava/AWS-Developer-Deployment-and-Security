@@ -2,7 +2,7 @@
 curl --silent --location https://rpm.nodesource.com/setup_8.x | sudo bash -
 sudo yum install -y nodejs
 sudo yum install -y git
-git clone https://github.com/JACjava/hbfl-master.git --branch Communicating-with-AWS --single-branch
+git clone https://github.com/JACjava/hbfl-master.git --branch HBFL-Complete-Application-with-Cloud-Formation-S3 --single-branch
 cd hbfl-master
 npm i
 npm run start

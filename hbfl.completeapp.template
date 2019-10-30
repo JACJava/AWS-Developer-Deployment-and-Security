@@ -104,7 +104,7 @@
         "InstanceType": { "Ref": "InstanceTypeParameter"},
         "KeyName": { "Ref": "KeyNameParameter" },
         "SecurityGroups": [ { "Ref": "HamsterSecurityGroupCF" } ],
-        "UserData": "IyEvYmluL2Jhc2gNCmN1cmwgLS1zaWxlbnQgLS1sb2NhdGlvbiBodHRwczovL3JwbS5ub2Rlc291cmNlLmNvbS9zZXR1cF84LnggfCBzdWRvIGJhc2ggLQ0Kc3VkbyB5dW0gaW5zdGFsbCAteSBub2RlanMNCnN1ZG8geXVtIGluc3RhbGwgLXkgZ2l0DQpnaXQgY2xvbmUgaHR0cHM6Ly9naXRodWIuY29tL0pBQ2phdmEvaGJmbC1tYXN0ZXIuZ2l0IC0tYnJhbmNoIENvbW11bmljYXRpbmctd2l0aC1BV1MgLS1zaW5nbGUtYnJhbmNoDQpjZCBoYmZsLW1hc3Rlcg0KbnBtIGkNCm5wbSBydW4gc3RhcnQ="
+        "UserData": "IyEvYmluL2Jhc2gNCmN1cmwgLS1zaWxlbnQgLS1sb2NhdGlvbiBodHRwczovL3JwbS5ub2Rlc291cmNlLmNvbS9zZXR1cF84LnggfCBzdWRvIGJhc2ggLQ0Kc3VkbyB5dW0gaW5zdGFsbCAteSBub2RlanMNCnN1ZG8geXVtIGluc3RhbGwgLXkgZ2l0DQpnaXQgY2xvbmUgaHR0cHM6Ly9naXRodWIuY29tL0pBQ2phdmEvaGJmbC1tYXN0ZXIuZ2l0IC0tYnJhbmNoIEhCRkwtQ29tcGxldGUtQXBwbGljYXRpb24td2l0aC1DbG91ZC1Gb3JtYXRpb24tUzMgLS1zaW5nbGUtYnJhbmNoDQpjZCBoYmZsLW1hc3Rlcg0KbnBtIGkNCm5wbSBydW4gc3RhcnQ="
       }
     },
 
@@ -178,7 +178,16 @@
         "Port" : 80,
         "Protocol" : "HTTP"
       }
+    },
+
+    "HamsterS3BucketCF" : {
+      "Type" : "AWS::S3::Bucket",
+      "Properties" : {
+        "BucketName" : "hamster-bucket-julieawscf",
+        "AccessControl" : "PublicRead"
+      }
     }
+
   },
 
   "Outputs": {
@@ -193,7 +202,14 @@
     "HamsterEC2InstancePublicDNSNameCF": {
       "Description": "Public DNS Name of the newly created EC2 instance",
       "Value": {"Fn::GetAtt" : ["HamsterEC2InstanceCF","PublicDnsName" ]}
+    },
+    "HamsterS3BucketCF": {
+      "Description": "Arn of the newly created S3 bucket",
+      "Value": {"Fn::GetAtt" : ["HamsterS3BucketCF","Arn" ]}
     }
+
+
+
   }
 
 }
