@@ -45,12 +45,14 @@
       "Properties" : {
         "Port" : 80,
         "Protocol" : "HTTP",
-        "Targets": "i-0737d1630b4344313",
+        "Targets": [{ "Id": "i-0737d1630b4344313"}],
+        "TargetType": "instance",
+        "HealthCheckPath": "/index.html",
         "VpcId" : { "Ref": "VPCIdParameter" }
       }
     },
 
-    "UDemyLoadBalancerSecurityGroupCF": {
+    "UdemyLoadBalancerSecurityGroupCF": {
       "Type": "AWS::EC2::SecurityGroup",
       "Properties": {
         "GroupDescription": "Enable Load Balancer connections on port 80",
