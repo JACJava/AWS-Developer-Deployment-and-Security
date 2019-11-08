@@ -1,7 +1,7 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
 
-  "Description": "Hamster Ball Fantasy League Application From Cloud FormationCF",
+  "Description": "Hamster Ball Fantasy League Application From Cloud Formation (Production)",
 
   "Parameters": {
     "InstanceTypeParameter": {
@@ -45,7 +45,7 @@
         "SecurityGroupIds": [ { "Ref": "HamsterSecurityGroupCF" } ],
         "KeyName": { "Ref": "KeyNameParameter" },
         "ImageId": { "Ref": "ImageIdParameter"},
-        "UserData": "IyEvYmluL2Jhc2gNCmN1cmwgLS1zaWxlbnQgLS1sb2NhdGlvbiBodHRwczovL3JwbS5ub2Rlc291cmNlLmNvbS9zZXR1cF84LnggfCBzdWRvIGJhc2ggLQ0Kc3VkbyB5dW0gaW5zdGFsbCAteSBub2RlanMNCnN1ZG8geXVtIGluc3RhbGwgLXkgZ2l0DQpnaXQgY2xvbmUgaHR0cHM6Ly9naXRodWIuY29tL0pBQ2phdmEvaGJmbC1tYXN0ZXIuZ2l0IC0tYnJhbmNoIEhCRkwtQ29tcGxldGUtQXBwbGljYXRpb24td2l0aC1DbG91ZC1Gb3JtYXRpb24tUzMgLS1zaW5nbGUtYnJhbmNoDQpjZCBoYmZsLW1hc3Rlcg0KbnBtIGkNCm5wbSBydW4gc3RhcnQ="
+        "UserData": "IyEvYmluL2Jhc2gKY3VybCAtLXNpbGVudCAtLWxvY2F0aW9uIGh0dHBzOi8vcnBtLm5vZGVzb3VyY2UuY29tL3NldHVwXzgueCB8IHN1ZG8gYmFzaCAtCnN1ZG8geXVtIGluc3RhbGwgLXkgbm9kZWpzCnN1ZG8geXVtIGluc3RhbGwgLXkgZ2l0CmdpdCBjbG9uZSBodHRwczovL2dpdGh1Yi5jb20vSkFDamF2YS9oYmZsLW1hc3Rlci5naXQgLS1icmFuY2ggQ29tbXVuaWNhdGluZy13aXRoLUFXUyAtLXNpbmdsZS1icmFuY2gKY2QgaGJmbC1tYXN0ZXIKbnBtIGkKbnBtIHJ1biBzdGFydA=="
       }
     },
 
@@ -105,7 +105,7 @@
         "InstanceType": { "Ref": "InstanceTypeParameter"},
         "KeyName": { "Ref": "KeyNameParameter" },
         "SecurityGroups": [ { "Ref": "HamsterSecurityGroupCF" } ],
-        "UserData": "IyEvYmluL2Jhc2gNCmN1cmwgLS1zaWxlbnQgLS1sb2NhdGlvbiBodHRwczovL3JwbS5ub2Rlc291cmNlLmNvbS9zZXR1cF84LnggfCBzdWRvIGJhc2ggLQ0Kc3VkbyB5dW0gaW5zdGFsbCAteSBub2RlanMNCnN1ZG8geXVtIGluc3RhbGwgLXkgZ2l0DQpnaXQgY2xvbmUgaHR0cHM6Ly9naXRodWIuY29tL0pBQ2phdmEvaGJmbC1tYXN0ZXIuZ2l0IC0tYnJhbmNoIEhCRkwtQ29tcGxldGUtQXBwbGljYXRpb24td2l0aC1DbG91ZC1Gb3JtYXRpb24tUzMgLS1zaW5nbGUtYnJhbmNoDQpjZCBoYmZsLW1hc3Rlcg0KbnBtIGkNCm5wbSBydW4gc3RhcnQ="
+        "UserData": "IyEvYmluL2Jhc2gKY3VybCAtLXNpbGVudCAtLWxvY2F0aW9uIGh0dHBzOi8vcnBtLm5vZGVzb3VyY2UuY29tL3NldHVwXzgueCB8IHN1ZG8gYmFzaCAtCnN1ZG8geXVtIGluc3RhbGwgLXkgbm9kZWpzCnN1ZG8geXVtIGluc3RhbGwgLXkgZ2l0CmdpdCBjbG9uZSBodHRwczovL2dpdGh1Yi5jb20vSkFDamF2YS9oYmZsLW1hc3Rlci5naXQgLS1icmFuY2ggQ29tbXVuaWNhdGluZy13aXRoLUFXUyAtLXNpbmdsZS1icmFuY2gKY2QgaGJmbC1tYXN0ZXIKbnBtIGkKbnBtIHJ1biBzdGFydA=="
       }
     },
 
@@ -182,13 +182,14 @@
       }
     },
 
-    "HamsterS3BucketCF" : {
-      "Type" : "AWS::S3::Bucket",
-      "Properties" : {
-        "BucketName" : "hamster-bucket-julieawscf",
-        "AccessControl" : "PublicRead"
-      }
-    }
+    "HamsterKinesisStreamCF": {
+         "Type": "AWS::Kinesis::Stream",
+         "Properties": {
+             "Name": "hamster-race-results",
+             "RetentionPeriodHours" : 24,
+             "ShardCount": 1
+         }
+     }
 
   },
 
@@ -205,11 +206,10 @@
       "Description": "Public DNS Name of the newly created EC2 instance",
       "Value": {"Fn::GetAtt" : ["HamsterEC2InstanceCF","PublicDnsName" ]}
     },
-    "HamsterS3BucketCF": {
-      "Description": "Arn of the newly created S3 bucket",
-      "Value": {"Fn::GetAtt" : ["HamsterS3BucketCF","Arn" ]}
+    "HamsterKinesisStreamCF": {
+      "Description": "Arn of the newly created Kinesis Stream",
+      "Value": {"Fn::GetAtt" : ["HamsterKinesisStreamCF","Arn" ]}
     }
-
 
 
   }
