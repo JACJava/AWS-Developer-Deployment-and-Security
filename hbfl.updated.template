@@ -55,6 +55,7 @@
         "KeyName": { "Ref": "KeyNameParameter" },
         "ImageId": { "Ref": "ImageIdParameter"},
         "SubnetId": "subnet-bda2acd5",
+        "Tags" : [ {"Key" : "Name", "Value" : "Hamster Cloud Formation"}],
         "UserData": { "Fn::FindInMap": ["Static", "UserData", "Value"] }
       }
     },
@@ -85,6 +86,7 @@
           { "Fn::Select": [ "0", { "Fn::GetAZs" : { "Ref" : "AWS::Region" } } ] },
           { "Fn::Select": [ "1", { "Fn::GetAZs" : { "Ref" : "AWS::Region" } } ] }
         ],
+        "Tags": [ { "Key":"Name", "Value":"Hamster Cloud Formation","PropagateAtLaunch":"true" } ],
         "LaunchConfigurationName": { "Ref": "HamsterLaunchConfiguration" },
         "MaxSize": "2",
         "MinSize": "1",
