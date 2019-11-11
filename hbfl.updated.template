@@ -1,0 +1,210 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+
+  "Description": "Hamster Ball Fantasy League Application From Cloud Formation",
+
+  "Mappings": {
+    "Static": {
+      "UserData": {
+        "Value": "IyEvYmluL2Jhc2gKY3VybCAtLXNpbGVudCAtLWxvY2F0aW9uIGh0dHBzOi8vcnBtLm5vZGVzb3VyY2UuY29tL3NldHVwXzgueCB8IHN1ZG8gYmFzaCAtCnN1ZG8geXVtIGluc3RhbGwgLXkgbm9kZWpzCnN1ZG8geXVtIGluc3RhbGwgLXkgZ2l0CmdpdCBjbG9uZSBodHRwczovL2dpdGh1Yi5jb20vSkFDamF2YS9oYmZsLW1hc3Rlci5naXQgLS1icmFuY2ggQ29tbXVuaWNhdGluZy13aXRoLUFXUyAtLXNpbmdsZS1icmFuY2gKY2QgaGJmbC1tYXN0ZXIKbnBtIGkKbnBtIHJ1biBzdGFydA=="
+      }
+    }
+  },
+
+  "Parameters": {
+    "InstanceTypeParameter": {
+      "Description": "EC2 instance type",
+      "Type": "String",
+      "Default": "t2.micro",
+      "AllowedValues": [ "t1.micro", "t2.nano", "t2.micro", "t2.small", "t2.medium", "t2.large", "m1.small", "m1.medium", "m1.large", "m1.xlarge", "m2.xlarge", "m2.2xlarge", "m2.4xlarge", "m3.medium", "m3.large", "m3.xlarge", "m3.2xlarge", "m4.large", "m4.xlarge", "m4.2xlarge", "m4.4xlarge", "m4.10xlarge", "c1.medium", "c1.xlarge", "c3.large", "c3.xlarge", "c3.2xlarge", "c3.4xlarge", "c3.8xlarge", "c4.large", "c4.xlarge", "c4.2xlarge", "c4.4xlarge", "c4.8xlarge", "g2.2xlarge", "g2.8xlarge", "r3.large", "r3.xlarge", "r3.2xlarge", "r3.4xlarge", "r3.8xlarge", "i2.xlarge", "i2.2xlarge", "i2.4xlarge", "i2.8xlarge", "d2.xlarge", "d2.2xlarge", "d2.4xlarge", "d2.8xlarge", "hi1.4xlarge", "hs1.8xlarge", "cr1.8xlarge", "cc2.8xlarge", "cg1.4xlarge"],
+      "ConstraintDescription": "must be a valid EC2 instance type."
+    },
+
+    "ImageIdParameter": {
+      "Description": "AMI id for the EC2 instance",
+      "Type": "AWS::EC2::Image::Id",
+      "Default": "ami-0c64dd618a49aeee8"
+    },
+
+    "KeyNameParameter": {
+      "Description": "Key pair name for the EC2 instance",
+      "Type": "AWS::EC2::KeyPair::KeyName",
+      "Default": "hamster_key"
+    },
+
+    "VPCIdParameter": {
+      "Description": "VPC id for the Target Group",
+      "Type": "AWS::EC2::VPC::Id",
+      "Default": "vpc-0164826a"
+    },
+
+    "SubnetListParameter": {
+      "Description": "List of Subnets for the Load Balancer. These should be for the a and b availability zones",
+      "Type": "List<AWS::EC2::Subnet::Id>",
+      "Default": "subnet-bda2acd5,subnet-951a5def"
+    }
+  },
+
+  "Resources": {
+    "HamsterEC2Instance": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "InstanceType": { "Ref": "InstanceTypeParameter" },
+        "IamInstanceProfile": { "Ref": "HamsterIAMInstanceProfile"},
+        "SecurityGroupIds": [ { "Ref": "HamsterSecurityGroup" } ],
+        "KeyName": { "Ref": "KeyNameParameter" },
+        "ImageId": { "Ref": "ImageIdParameter"},
+        "SubnetId": "subnet-bda2acd5",
+        "UserData": { "Fn::FindInMap": ["Static", "UserData", "Value"] }
+      }
+    },
+
+    "HamsterSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Enable SSH access via port 22",
+        "SecurityGroupIngress": [ {
+          "IpProtocol": "tcp",
+          "FromPort": "22",
+          "ToPort": "22",
+          "CidrIp": "0.0.0.0/0"
+        }, {
+          "IpProtocol": "tcp",
+          "FromPort": "3000",
+          "ToPort": "3000",
+          "CidrIp": "0.0.0.0/0"
+        } ],
+        "VpcId": { "Ref": "VPCIdParameter" }
+      }
+    },
+
+    "HamsterAutoScalingGroup": {
+      "Type": "AWS::AutoScaling::AutoScalingGroup",
+      "Properties": {
+        "AvailabilityZones": [
+          { "Fn::Select": [ "0", { "Fn::GetAZs" : { "Ref" : "AWS::Region" } } ] },
+          { "Fn::Select": [ "1", { "Fn::GetAZs" : { "Ref" : "AWS::Region" } } ] }
+        ],
+        "LaunchConfigurationName": { "Ref": "HamsterLaunchConfiguration" },
+        "MaxSize": "2",
+        "MinSize": "1",
+        "TargetGroupARNs": [ { "Ref": "HamsterTargetGroup" } ]
+      }
+    },
+
+    "HamsterAutoScalingGroupPolicy": {
+      "Type": "AWS::AutoScaling::ScalingPolicy",
+      "Properties": {
+        "AdjustmentType": "ChangeInCapacity",
+        "AutoScalingGroupName": { "Ref": "HamsterAutoScalingGroup"},
+        "PolicyType": "TargetTrackingScaling",
+        "TargetTrackingConfiguration": {
+          "PredefinedMetricSpecification": {
+            "PredefinedMetricType": "ASGAverageCPUUtilization"
+          },
+          "TargetValue": 5
+        }
+      }
+    },
+
+    "HamsterLaunchConfiguration": {
+      "Type": "AWS::AutoScaling::LaunchConfiguration",
+      "Properties": {
+        "IamInstanceProfile": { "Ref": "HamsterIAMInstanceProfile"},
+        "ImageId": { "Ref": "ImageIdParameter"},
+        "InstanceType": { "Ref": "InstanceTypeParameter"},
+        "KeyName": { "Ref": "KeyNameParameter" },
+        "SecurityGroups": [ { "Ref": "HamsterSecurityGroup" } ],
+        "UserData": { "Fn::FindInMap": ["Static", "UserData", "Value"] }
+      }
+    },
+
+    "HamsterTargetGroup": {
+      "Type" : "AWS::ElasticLoadBalancingV2::TargetGroup",
+      "Properties" : {
+        "Port" : 3000,
+        "Protocol" : "HTTP",
+        "Targets": [{ "Id": { "Ref": "HamsterEC2Instance" } }],
+        "VpcId" : { "Ref": "VPCIdParameter" }
+      }
+    },
+
+    "HamsterEC2InstanceRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ec2.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "ManagedPolicyArns": [ "arn:aws:iam::aws:policy/AdministratorAccess" ]
+      }
+    },
+
+    "HamsterIAMInstanceProfile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Roles": [ { "Ref": "HamsterEC2InstanceRole" } ]
+      }
+    },
+
+    "HamsterLoadBalancerSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Enable Load Balancer connections on port 80",
+        "SecurityGroupIngress": [ {
+          "IpProtocol": "tcp",
+          "FromPort": "80",
+          "ToPort": "80",
+          "CidrIp": "0.0.0.0/0"
+        } ]
+      }
+    },
+
+    "HamsterLoadBalancer": {
+      "Type" : "AWS::ElasticLoadBalancingV2::LoadBalancer",
+      "Properties" : {
+        "SecurityGroups" : [{ "Fn::GetAtt": ["HamsterLoadBalancerSecurityGroup", "GroupId"] }],
+        "Subnets" : { "Ref": "SubnetListParameter" }
+      }
+    },
+
+    "HamsterListener": {
+      "Type" : "AWS::ElasticLoadBalancingV2::Listener",
+      "Properties" : {
+        "DefaultActions" : [
+          {
+            "TargetGroupArn": { "Ref": "HamsterTargetGroup" },
+            "Type": "forward"
+          }
+        ],
+        "LoadBalancerArn" : { "Ref": "HamsterLoadBalancer" },
+        "Port" : 80,
+        "Protocol" : "HTTP"
+      }
+    }
+  },
+
+  "Outputs": {
+    "LoadBalancerUrl": {
+      "Description": "URL link to the HamsterLoadBalancer",
+      "Value": { "Fn::Sub": ["http://${url}", { "url": { "Fn::GetAtt": [ "HamsterLoadBalancer", "DNSName" ] } }] }
+    },
+    "HamsterEC2Instance": {
+      "Description": "InstanceId of the newly created EC2 instance",
+      "Value" : { "Ref" : "HamsterEC2Instance" }
+    },
+    "HamsterEC2InstancePublicDNSName": {
+      "Description": "Public DNS Name of the newly created EC2 instance",
+      "Value": {"Fn::GetAtt" : ["HamsterEC2Instance","PublicDnsName" ]}
+    }
+  }
+
+}
