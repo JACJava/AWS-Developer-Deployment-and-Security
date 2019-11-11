@@ -191,7 +191,16 @@
         "Port" : 80,
         "Protocol" : "HTTP"
       }
-    }
+    },
+
+    "HamsterKinesisStream": {
+         "Type": "AWS::Kinesis::Stream",
+         "Properties": {
+             "Name": "hamster-race-results",
+             "RetentionPeriodHours" : 24,
+             "ShardCount": 1
+         }
+     }
   },
 
   "Outputs": {
@@ -206,6 +215,10 @@
     "HamsterEC2InstancePublicDNSName": {
       "Description": "Public DNS Name of the newly created EC2 instance",
       "Value": {"Fn::GetAtt" : ["HamsterEC2Instance","PublicDnsName" ]}
+    },
+    "HamsterKinesisStream": {
+      "Description": "Arn of the newly created Kinesis Stream",
+      "Value": {"Fn::GetAtt" : ["HamsterKinesisStream","Arn" ]}
     }
   }
 
