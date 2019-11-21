@@ -57,7 +57,8 @@
         "SubnetId": "subnet-bda2acd5",
         "Tags" : [ {"Key" : "Name", "Value" : "Hamster Cloud Formation"}],
         "UserData": { "Fn::FindInMap": ["Static", "UserData", "Value"] }
-      }
+      },
+      "DependsOn" : "HamsterRDSDatabase"
     },
 
     "HamsterSecurityGroup": {
@@ -200,8 +201,40 @@
              "RetentionPeriodHours" : 24,
              "ShardCount": 1
          }
-     }
-  },
+     },
+
+     "HamsterRDSDatabase" : {
+         "Type" : "AWS::RDS::DBInstance",
+         "Properties" : {
+            "AllocatedStorage" : "5",
+            "DBInstanceClass" : "db.t2.micro",
+            "DBInstanceIdentifier" : "user",
+            "DBName" : "user",
+            "Engine" : "MySQL",
+            "EngineVersion" : "5.7.22",
+            "MasterUsername" : "admin",
+            "MasterUserPassword" : "mypassword",
+            "StorageType" : "gp2",
+            "VPCSecurityGroups" : [ { "Ref": "HamsterVPCDBSecurityGroup" } ]
+         }
+     },
+
+     "HamsterVPCDBSecurityGroup" : {
+         "Type" : "AWS::EC2::SecurityGroup",
+         "Properties" : {
+           "GroupDescription" : "Security group for HamsterRDSDatabase",
+           "GroupName" : "user-db-sg",
+           "SecurityGroupIngress" : [{
+                    "IpProtocol" : "tcp",
+                    "FromPort" : 3306,
+                    "ToPort" : 3306,
+                    "CidrIp" : "0.0.0.0/0"
+                 }],
+           "Tags" : [ {"Key" : "Name", "Value" : "Hamster Cloud Formation"}],
+           "VpcId": { "Ref": "VPCIdParameter" }
+         }
+       }
+},
 
   "Outputs": {
     "LoadBalancerUrl": {
@@ -219,6 +252,18 @@
     "HamsterKinesisStream": {
       "Description": "Arn of the newly created Kinesis Stream",
       "Value": {"Fn::GetAtt" : ["HamsterKinesisStream","Arn" ]}
+    },
+    "HamsterRDSDatabaseName": {
+      "Description": "DB Instance Name of the HamsterRDSDatabase",
+      "Value" : { "Ref" : "HamsterRDSDatabase" }
+    },
+    "HamsterRDSDatabaseEndpoint": {
+      "Description": "Endpoint of the HamsterRDSDatabase",
+      "Value": {"Fn::GetAtt" : ["HamsterRDSDatabase","Endpoint.Address" ]}
+    },
+    "HamsterRDSDatabasePort": {
+      "Description": "Port of the HamsterRDSDatabase",
+      "Value": {"Fn::GetAtt" : ["HamsterRDSDatabase","Endpoint.Port" ]}
     }
   }
 
