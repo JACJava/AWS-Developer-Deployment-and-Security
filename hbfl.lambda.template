@@ -48,6 +48,7 @@
 
 
 ***doesn't belong here -- needs to be in the kinesis template....but here for reference...
+https://docs.aws.amazon.com/lambda/latest/dg/nodejs-create-deployment-pkg.html
 https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-enabled
    "HamsterLambdaEventSourceMapping": {
      "Type" : "AWS::Lambda::EventSourceMapping",
