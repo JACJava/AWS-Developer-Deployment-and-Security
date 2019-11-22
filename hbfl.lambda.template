@@ -1,0 +1,80 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+
+  "Description": "HBFL Application Lambda Creation",
+
+  "Parameters": {
+    "VPCIdParameter": {
+      "Description": "VPC id for the Target and DB Security Group",
+      "Type": "AWS::EC2::VPC::Id",
+      "Default": "vpc-0164826a"
+    }
+  },
+
+  "Resources": {
+    "HamsterLambdaFunction" : {
+      "Type" : "AWS::Lambda::Function",
+      "Properties" : {
+         "FunctionName" : "hamster-kinesis-stream-consumer2",
+         "Code" : {
+           "S3Bucket" : "hamster-lambda-function",
+           "S3Key" : "index.js",
+         },
+         "Role": {"Fn::GetAtt": ["HamsterLambdaExecutionRole","Arn"]},
+         "Runtime" : "nodejs10.x",
+         "Description" : "A kinesis consumer for the hbfl demo project",
+         "MemorySize" : 128,
+         "Timeout" : 15,
+         "Tags" : [ {"Key" : "Name", "Value" : "Hamster Cloud Formation"}]
+      }
+    },
+    "HamsterLambdaExecutionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "Rolename" : "lambda-kinesis-consumer-role2",
+        "Path": "/service-role/",
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [{ "Effect": "Allow", "Principal": {"Service": ["lambda.amazonaws.com"]}, "Action": ["sts:AssumeRole"] }]
+        },
+        "ManagedPolicyArns": [
+                 "arn:aws:iam::aws:policy/AmazonKinesisReadOnlyAccess",
+                 "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess",
+                 "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+       "Tags" : [ {"Key" : "Name", "Value" : "Hamster Cloud Formation"}]
+      }
+    },
+
+
+***doesn't belong here -- needs to be in the kinesis template....but here for reference...
+https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-enabled
+   "HamsterLambdaEventSourceMapping": {
+     "Type" : "AWS::Lambda::EventSourceMapping",
+     "Properties" : {
+       "EventSourceArn" : {"Fn::GetAtt": ["put kinesis name here","Arn"]},
+       "FunctionName" : "hamster-kinesis-stream-consumer2",
+       "StartingPosition" : "LATEST",
+       "BatchSize" : 100
+       }
+     }
+
+
+},
+
+  "Outputs": {
+    "HamsterRDSDatabaseName": {
+      "Description": "DB Instance Name of the HamsterRDSDatabase",
+      "Value" : { "Ref" : "HamsterRDSDatabase" }
+    },
+    "HamsterRDSDatabaseEndpoint": {
+      "Description": "Endpoint of the HamsterRDSDatabase",
+      "Value": {"Fn::GetAtt" : ["HamsterRDSDatabase","Endpoint.Address" ]}
+    },
+    "HamsterRDSDatabasePort": {
+      "Description": "Port of the HamsterRDSDatabase",
+      "Value": {"Fn::GetAtt" : ["HamsterRDSDatabase","Endpoint.Port" ]}
+    }
+  }
+
+}
