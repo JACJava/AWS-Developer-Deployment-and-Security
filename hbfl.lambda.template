@@ -18,8 +18,9 @@
          "FunctionName" : "hamster-kinesis-stream-consumer2",
          "Code" : {
            "S3Bucket" : "hamster-lambda-function",
-           "S3Key" : "index.js",
+           "S3Key" : "function.zip",
          },
+         "Handler": "index.handler",
          "Role": {"Fn::GetAtt": ["HamsterLambdaExecutionRole","Arn"]},
          "Runtime" : "nodejs10.x",
          "Description" : "A kinesis consumer for the hbfl demo project",
@@ -31,7 +32,7 @@
     "HamsterLambdaExecutionRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
-        "Rolename" : "lambda-kinesis-consumer-role2",
+        "RoleName" : "lambda-kinesis-consumer-role2",
         "Path": "/service-role/",
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
@@ -42,40 +43,28 @@
                  "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess",
                  "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
-       "Tags" : [ {"Key" : "Name", "Value" : "Hamster Cloud Formation"}]
+       "Tags" : [ {"Key" : "Name", "Value" : "Hamster Cloud Formation"} ]
       }
-    },
-
-
-***doesn't belong here -- needs to be in the kinesis template....but here for reference...
-https://docs.aws.amazon.com/lambda/latest/dg/nodejs-create-deployment-pkg.html
-https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html#cfn-lambda-eventsourcemapping-enabled
-   "HamsterLambdaEventSourceMapping": {
-     "Type" : "AWS::Lambda::EventSourceMapping",
-     "Properties" : {
-       "EventSourceArn" : {"Fn::GetAtt": ["put kinesis name here","Arn"]},
-       "FunctionName" : "hamster-kinesis-stream-consumer2",
-       "StartingPosition" : "LATEST",
-       "BatchSize" : 100
-       }
-     }
-
-
-},
+    }
+  },
 
   "Outputs": {
-    "HamsterRDSDatabaseName": {
-      "Description": "DB Instance Name of the HamsterRDSDatabase",
-      "Value" : { "Ref" : "HamsterRDSDatabase" }
+    "HamsterLambdaFunction": {
+      "Description": "Name of the Hamster Lambda Function",
+      "Value" : { "Ref" : "HamsterLambdaFunction" }
     },
-    "HamsterRDSDatabaseEndpoint": {
-      "Description": "Endpoint of the HamsterRDSDatabase",
-      "Value": {"Fn::GetAtt" : ["HamsterRDSDatabase","Endpoint.Address" ]}
+    "HamsterLambdaArn": {
+      "Description": "Arn of the Hamster Lambda Function",
+      "Value": {"Fn::GetAtt" : ["HamsterLambdaFunction","Arn" ]}
     },
-    "HamsterRDSDatabasePort": {
-      "Description": "Port of the HamsterRDSDatabase",
-      "Value": {"Fn::GetAtt" : ["HamsterRDSDatabase","Endpoint.Port" ]}
+    "HamsterLambdaExecutionRole": {
+      "Description": "Name of the Hamster Lambda Execution Role",
+      "Value" : { "Ref" : "HamsterLambdaExecutionRole" }
+    },
+    "HamsterLambdaExecutionRoleArn": {
+      "Description": "Arn of the Hamster Lambda Execution Role",
+      "Value": {"Fn::GetAtt" : ["HamsterLambdaExecutionRole","Arn" ]}
     }
   }
 
-}
+  }

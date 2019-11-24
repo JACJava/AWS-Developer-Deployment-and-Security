@@ -1,0 +1,35 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+
+  "Description": "HBFL Application Event Source Mapping for Lambda Function",
+
+  "Parameters": {
+    "VPCIdParameter": {
+      "Description": "VPC id for the Target and DB Security Group",
+      "Type": "AWS::EC2::VPC::Id",
+      "Default": "vpc-0164826a"
+    }
+  },
+
+  "Resources": {
+
+   "HamsterLambdaEventSourceMapping": {
+     "Type" : "AWS::Lambda::EventSourceMapping",
+     "Properties" : {
+       "EventSourceArn" : {"Fn::GetAtt": ["HamsterKinesisStream","Arn"]},
+       "FunctionName" : "hamster-kinesis-stream-consumer2",
+       "StartingPosition" : "LATEST",
+       "BatchSize" : 100
+       }
+     }
+
+},
+
+  "Outputs": {
+    "HamsterLambdaEventSourceMapping": {
+      "Description": "ID of the Event Source Mapping",
+      "Value" : { "Ref" : "HamsterLambdaEventSourceMapping" }
+    }
+  }
+
+}
