@@ -4,10 +4,17 @@
   "Description": "HBFL Application Lambda Creation",
 
   "Resources": {
+    "HamsterKinesisStream": {
+         "Type": "AWS::Kinesis::Stream",
+         "Properties": {
+             "Name": "hamster-race-results",
+             "RetentionPeriodHours" : 24,
+             "ShardCount": 1
+         }
+    },
     "HamsterLambdaFunction" : {
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
-         "FunctionName" : "hamster-kinesis-stream-consumer2",
          "Code" : {
            "S3Bucket" : "hamster-lambda-function",
            "S3Key" : "function.zip",
@@ -19,7 +26,7 @@
          "MemorySize" : 128,
          "Timeout" : 15,
          "Tags" : [ {"Key" : "Name", "Value" : "Hamster Cloud Formation"}]
-      }
+       }
     },
     "HamsterLambdaExecutionRole": {
       "Type": "AWS::IAM::Role",
@@ -29,18 +36,32 @@
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [{ "Effect": "Allow", "Principal": {"Service": ["lambda.amazonaws.com"]}, "Action": ["sts:AssumeRole"] }]
-        },
-        "ManagedPolicyArns": [
+      },
+      "ManagedPolicyArns": [
                  "arn:aws:iam::aws:policy/AmazonKinesisReadOnlyAccess",
                  "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess",
                  "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-       "Tags" : [ {"Key" : "Name", "Value" : "Hamster Cloud Formation"} ]
+      ],
+      "Tags" : [ {"Key" : "Name", "Value" : "Hamster Cloud Formation"} ]
       }
+    },
+    "HamsterLambdaEventSourceMapping": {
+      "Type" : "AWS::Lambda::EventSourceMapping",
+      "Properties" : {
+        "EventSourceArn" : {"Fn::GetAtt": ["HamsterKinesisStream","Arn"]},
+        "FunctionName": {"Fn::GetAtt": ["HamsterLambdaFunction","Arn"]},
+        "StartingPosition" : "LATEST",
+        "BatchSize" : 100
+      },
+      "DependsOn" : "HamsterLambdaFunction"
     }
   },
 
   "Outputs": {
+    "HamsterKinesisStream": {
+      "Description": "Arn of the Hamster Kinesis Stream",
+      "Value": {"Fn::GetAtt" : ["HamsterKinesisStream","Arn" ]}
+    },
     "HamsterLambdaFunction": {
       "Description": "Name of the Hamster Lambda Function",
       "Value" : { "Ref" : "HamsterLambdaFunction" }
@@ -56,6 +77,10 @@
     "HamsterLambdaExecutionRoleArn": {
       "Description": "Arn of the Hamster Lambda Execution Role",
       "Value": {"Fn::GetAtt" : ["HamsterLambdaExecutionRole","Arn" ]}
+    },
+    "HamsterLambdaEventSourceMapping": {
+      "Description": "ID of the Event Source Mapping",
+      "Value" : { "Ref" : "HamsterLambdaEventSourceMapping" }
     }
   }
 
