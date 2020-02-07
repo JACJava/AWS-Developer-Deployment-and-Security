@@ -1,0 +1,62 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+
+  "Description": "Udemy Application RDS Database and Security Group Creation",
+
+  "Parameters": {
+    "VPCIdParameter": {
+      "Description": "VPC id for the Target and DB Security Group",
+      "Type": "AWS::EC2::VPC::Id",
+      "Default": "vpc-0164826a"
+    }
+  },
+
+  "Resources": {
+    "UdemyRDSDatabase" : {
+              "Type" : "AWS::RDS::DBInstance",
+              "Properties" : {
+                 "AllocatedStorage" : "5",
+                 "DBInstanceClass" : "db.t2.micro",
+                 "DBInstanceIdentifier" : "acloudguru",
+                 "DBName" : "acloudguru",
+                 "Engine" : "MySQL",
+                 "EngineVersion" : "5.7.22",
+                 "MasterUsername" : "acloudguru",
+                 "MasterUserPassword" : "acloudguru",
+                 "StorageType" : "gp2",
+                 "VPCSecurityGroups" : [ { "Ref": "UdemyVPCDBSecurityGroup" } ]
+              }
+          },
+    "UdemyVPCDBSecurityGroup" : {
+          "Type" : "AWS::EC2::SecurityGroup",
+          "Properties" : {
+            "GroupDescription" : "Security group for Udemy RDS Database",
+            "GroupName" : "RDS-SG",
+            "SecurityGroupIngress" : [{
+                     "IpProtocol" : "tcp",
+                     "FromPort" : 3306,
+                     "ToPort" : 3306,
+                     "CidrIp" : "0.0.0.0/0"
+                  }],
+            "Tags" : [ {"Key" : "Name", "Value" : "Udemy Cloud Formation"}],
+            "VpcId": { "Ref": "VPCIdParameter" }
+          }
+    }
+  },
+
+  "Outputs": {
+    "UdemyRDSDatabase": {
+      "Description": "DB Instance Name of the UdemyRDSDatabase",
+      "Value" : { "Ref" : "UdemyRDSDatabase" }
+    },
+    "UdemyRDSDatabaseEndpoint": {
+      "Description": "Endpoint of the UdemyRDSDatabase",
+      "Value": {"Fn::GetAtt" : ["UdemyRDSDatabase","Endpoint.Address" ]}
+    },
+    "UdemyRDSDatabasePort": {
+      "Description": "Port of the UdemyRDSDatabase",
+      "Value": {"Fn::GetAtt" : ["UdemyRDSDatabase","Endpoint.Port" ]}
+    }
+  }
+
+}
