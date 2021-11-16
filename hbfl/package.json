@@ -14,7 +14,7 @@
   "dependencies": {
     "archiver": "2.0.3",
     "array-shuffle": "1.0.1",
-    "aws-sdk": "2.91.0",
+    "aws-sdk": "2.814.0",
     "babel-plugin-transform-object-rest-spread": "6.23.0",
     "bluebird": "3.5.0",
     "boom": "5.2.0",
